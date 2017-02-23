@@ -1,0 +1,2 @@
+﻿Wyrażenia lambda są bardzo przydatną zmianą jaka weszła do Javy 8. W przypadku dat mieliśmy do czynienia z nowym standardem, który zastępuje wcześniej stosowane rozwiązania (np. bibliotekę Joda). Tym razem, nadal możemy programować "po staremu", jednak czystość kodu wynikająca z prawidłowego stosowania lambd jest naprawdę fajnym zyskiem. 
+Dlatego zachęcamy do zapoznania się z tym elementem języka i wcieleniem go do swojego codziennego programowania.
