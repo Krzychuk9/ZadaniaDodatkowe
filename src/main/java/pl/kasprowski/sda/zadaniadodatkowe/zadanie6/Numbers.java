@@ -4,8 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Numbers {
-    private Map<Integer, String[]> numbers;
+    public static final String[] THOUSANDS = {"tysiąc", " tysiące", " tysięcy"};
+    public static final String[] HOUNDREDS = {"sto", "dwieście", "sta", "set"};
+    public static final String[] TENS = {"dzieścia", "dzieści", "dziesiąt"};
+    public static final String[] TEENS = {"dziesięć", "jedenaście", "naście"};
+    public static final String[] DIGITS = new String[]{"zero", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć"};
+    public static final String[] DIGITS_2 = new String[]{"zero", "jede", "dwa", "trzy", "czter", "pięt", "szes", "siedem", "osiem", "dziewięt"};//dziewięt?
 
+    private Map<Integer, String[]> numbers;
     public Numbers() {
         this.setNumbers();
     }
@@ -14,16 +20,14 @@ public class Numbers {
      * Fills map with string representation of numbers/prefix ect.
      */
     private void setNumbers() {
-        String[] digits = {"zero", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć"};
-        String[] digits2 = {"zero", "jede", "dwa", "trzy", "czter", "pięt", "szes", "siedem", "osiem", "dziewięt"};
 
         numbers = new HashMap<>();
-        numbers.put(1, digits);
-        numbers.put(2, new String[]{"dziesięć", "jedenaście", "naście"});
-        numbers.put(3, new String[]{"dzieścia", "dzieści", "dziesiąt"});
-        numbers.put(4, new String[]{"sto", "dwieście", "sta", "set"});
-        numbers.put(5, new String[]{"tysiąc", " tysiące", " tysięcy"});
-        numbers.put(6, digits2);
+        numbers.put(1, DIGITS);
+        numbers.put(2, TEENS);
+        numbers.put(3, TENS);
+        numbers.put(4, HOUNDREDS);
+        numbers.put(5, THOUSANDS);
+        numbers.put(6, DIGITS_2);
 
     }
 
@@ -44,6 +48,7 @@ public class Numbers {
                 sb.append("Milion!");
                 break;
             } else if ((tmp = number / 100000) > 0) {
+                //todo: te ify można jakoś sparametryzować, bo się powtarzają ;) poza tym całkiem nieźle.
                 if (tmp == 1) {
                     sb.append(numbers.get(4)[0] + " ");
                 } else if (tmp == 2) {
