@@ -7,7 +7,7 @@ public class Main {
         System.out.println(numbers.getNumber(20901));
         System.out.println(numbers.getNumber(99));
         System.out.println(numbers.getNumber(156789));
-        System.out.println(numbers.getNumber(1000000));
+        System.out.println(numbers.getNumber(999999));
     }
 
 }
