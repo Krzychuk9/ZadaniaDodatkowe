@@ -10,14 +10,11 @@ public class Coder {
      */
     public String encode(String s) {
         char[] array = s.toCharArray();
-        char tmp;
+        int tmp;
+        int offset = 65;
         for (int i = 0; i < array.length; i++) {
-            tmp = array[i];
-            if ((int) tmp < 88) {
-                array[i] = (char) (tmp + 3);
-            } else {
-                array[i] = (char) (tmp - 23);
-            }
+            tmp = ((int)array[i] - offset); // wiem, może trochę przekombinowane ale if ogranicza tylko do 2 rozwiązań
+            array[i] = (char) (((tmp+3)%26)+offset);
         }
         return String.valueOf(array);
     }
