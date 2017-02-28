@@ -46,11 +46,8 @@ public class SearchTools {
      */
     private void search(String desc, boolean exactSearch) {
         File file = new File(desc);
-        if (!file.isDirectory()) {
-            throw new RuntimeException("Wrong path!");
-        }
-        File[] files = file.listFiles();
-        if (files != null) {
+        File[] files = file.listFiles(); //ta metoda może przyjąc parametr FilenameFilter.
+        if (files != null) {//w tym miejscu następuje sprawdzenie czy desc jest katalogiem ;) (javadoc)
             for (File f : files) {
                 if (f.isDirectory()) {
                     this.search(f.getAbsolutePath(), exactSearch);
@@ -65,6 +62,9 @@ public class SearchTools {
                 }
             }
         }
+        else {
+            throw new RuntimeException("Wrong path!");
+        }
     }
 
     /**
@@ -74,8 +74,11 @@ public class SearchTools {
      * @return true if fileName matches pattern
      */
     private boolean isValid(String foundFile) {
-        String regex = ".*" + this.fileName.toLowerCase() + ".*\\.txt";
-        if (Pattern.matches(regex, foundFile.toLowerCase())) {
+        //todo: lepszym sposobem na budowanie ciągów znaków jest StringBuilder. Wynika to z natury klasy String.
+        StringBuilder regex = new StringBuilder(".*");
+        regex.append(this.fileName.toLowerCase());
+        regex.append(".*\\.txt");
+        if (Pattern.matches(regex.toString(), foundFile.toLowerCase())) {
             return true;
         }
         return false;
@@ -92,6 +95,13 @@ public class SearchTools {
 
     /**
      * Prints results in console
+     *
+     * **************************************************************************************************************
+     * todo: sposób ok.
+     * Niemniej jednak jeśli piszesz klasy narzędziowe, to weź pod uwagę, że one
+     * prawdopodobnie będą miały metody wołane z innych klas, które niekoniecznie będą coś wyświetlać na konsoli.
+     * każda z metod powinna zwracać coś sensownego (listę lub pojedynczy objekt w zależnośco co się dzieje)
+     * Wiem, że może to wyglądać na takie czepianie się, dlatego tylko miej to na uwadze ;)
      */
     private void print() {
         if (results.size() > 0) {
