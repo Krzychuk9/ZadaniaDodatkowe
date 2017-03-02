@@ -1,53 +1,74 @@
 package pl.kasprowski.sda.zadaniadodatkowe.zadanie9;
 
-import java.io.File;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class SearchTools {
     private String hardDrive = "C:\\";
     private String fileName;
+    private String content;
     private List<String> results;
+    private static final String EXTENSION = "txt";
 
     /**
-     * Searches hard drive (default C) for param txt file and display result in console, if file not found it displays "File not found!".
+     * Searches hard drive (default C) for param txt file and return result in list of found files paths, if file not found return empty list.
      * To change default hard drive (C) use setHardDrive method
      *
      * @param fileName    file name/part of file name being searched
      * @param exactSearch true if you want to find exactly this file, false if you want to find files matches to pattern *fileName*.txt
+     * @return List<String> of found files paths, if file not found return empty list
      */
-    public void searchFileInHardDrive(String fileName, boolean exactSearch) {
+    public List<String> searchFileInHardDrive(String fileName, boolean exactSearch) {
         results = new ArrayList<>();
         this.fileName = fileName;
         this.search(hardDrive, exactSearch);
-        this.print();
+        return this.results;
     }
 
     /**
-     * Searches destination and sub directories for param txt file and display result in console, if file not found it displays "File not found!"
+     * Searches destination and sub directories for param txt file and return result in list of found files paths, if file not found return empty list.
      *
      * @param desc        path to directory where you want to start
      * @param fileName    file name/part of file name being searched
      * @param exactSearch true if you want to find exactly this file, false if you want to find files matches to pattern *fileName*.txt
+     * @return List<String> of found files paths, if file not found return empty list
      */
-    public void searchFileInDirectory(String desc, String fileName, boolean exactSearch) {
+    public List<String> searchFileInDirectory(String desc, String fileName, boolean exactSearch) {
         results = new ArrayList<>();
         this.fileName = fileName;
         this.search(desc, exactSearch);
-        this.print();
+        return this.results;
     }
 
     /**
-     * Searches destination and sub directories for param txt file. Private method used in searchFileInDirectory and searchFileInHardDrive.
+     * Searches destination and sub directories for txt file containing indicated content and return result in list of files paths, if file does not exist return empty list.
+     *
+     * @param desc    path to directory where you want to start
+     * @param content String to find
+     * @return List<String> of found files paths, if file does not exist return empty list
+     */
+    public List<String> searchInFileInDirectory(String desc, String content) {
+        results = new ArrayList<>();
+        this.content = content;
+        this.searchInFile(desc);
+        return this.results;
+    }
+
+    /**
+     * Searches destination and sub directories for txt file. Private method used in searchFileInDirectory and searchFileInHardDrive.
      *
      * @param desc        path to directory where you want to start
      * @param exactSearch true if you want to find exactly this file, false if you want to find files matches to pattern *fileName*.txt
      */
     private void search(String desc, boolean exactSearch) {
         File file = new File(desc);
-        File[] files = file.listFiles(); //ta metoda może przyjąc parametr FilenameFilter.
-        if (files != null) {//w tym miejscu następuje sprawdzenie czy desc jest katalogiem ;) (javadoc)
+        File[] files = file.listFiles(f -> f.getName().toLowerCase().endsWith(EXTENSION) || f.isDirectory());
+        if (files != null) {
             for (File f : files) {
                 if (f.isDirectory()) {
                     this.search(f.getAbsolutePath(), exactSearch);
@@ -61,8 +82,42 @@ public class SearchTools {
                     }
                 }
             }
+        } else {
+            throw new RuntimeException("Wrong path!");
         }
-        else {
+    }
+
+    /**
+     * Searches destination and sub directories for txt file containing indicated substring. Private method used in searchInFileInDirectory.
+     *
+     * @param desc path to directory where you want to start
+     */
+    private void searchInFile(String desc) {
+        File file = new File(desc);
+        File[] files = file.listFiles(f -> f.getName().toLowerCase().endsWith(EXTENSION) || f.isDirectory());
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    this.searchInFile(f.getAbsolutePath());
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+//                        Stream<String> fileStream = Files.lines(Paths.get(f.getAbsolutePath()));
+//                        fileStream.forEach(s -> sb.append(s));
+//                        fileStream.close();
+                        if (sb.indexOf(this.content) != -1) {
+                            results.add(f.getAbsolutePath());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
             throw new RuntimeException("Wrong path!");
         }
     }
@@ -74,7 +129,6 @@ public class SearchTools {
      * @return true if fileName matches pattern
      */
     private boolean isValid(String foundFile) {
-        //todo: lepszym sposobem na budowanie ciągów znaków jest StringBuilder. Wynika to z natury klasy String.
         StringBuilder regex = new StringBuilder(".*");
         regex.append(this.fileName.toLowerCase());
         regex.append(".*\\.txt");
@@ -93,22 +147,5 @@ public class SearchTools {
         this.hardDrive = hardDrive + ":\\";
     }
 
-    /**
-     * Prints results in console
-     *
-     * **************************************************************************************************************
-     * todo: sposób ok.
-     * Niemniej jednak jeśli piszesz klasy narzędziowe, to weź pod uwagę, że one
-     * prawdopodobnie będą miały metody wołane z innych klas, które niekoniecznie będą coś wyświetlać na konsoli.
-     * każda z metod powinna zwracać coś sensownego (listę lub pojedynczy objekt w zależnośco co się dzieje)
-     * Wiem, że może to wyglądać na takie czepianie się, dlatego tylko miej to na uwadze ;)
-     */
-    private void print() {
-        if (results.size() > 0) {
-            System.out.println("Search for " + this.fileName + ", results: ");
-            this.results.stream().forEach(System.out::println);
-        } else {
-            System.out.println("File not found!");
-        }
-    }
+
 }
